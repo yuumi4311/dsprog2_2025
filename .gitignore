@@ -208,6 +208,6 @@ __marimo__/
 
 
 # DB files
-*.db
-*.sqlite
-*.sqlite3
+.db
+.sqlite
+.sqlite3
