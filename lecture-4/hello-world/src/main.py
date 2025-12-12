@@ -73,7 +73,7 @@ def main(page: ft.Page):
         elif t in "+-*/":
             stored_value = float(current_value)
             current_operator = t
-            new_input = True     # ← ここでクリアしない
+            new_input = True    
 
         # =
         elif t == "=" and current_operator:
