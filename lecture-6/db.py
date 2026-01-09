@@ -52,3 +52,17 @@ def load_forecasts(area_code):
     rows = cur.fetchall()
     conn.close()
     return rows
+def load_forecast_by_date(area_code, date):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT date, weather, temp_min, temp_max
+        FROM forecasts
+        WHERE area_code = ?
+        AND date = ?
+    """, (area_code, date))
+
+    row = cur.fetchone()
+    conn.close()
+    return row
