@@ -14,7 +14,8 @@ def init_db():
         date TEXT,
         weather TEXT,
         temp_min INTEGER,
-        temp_max INTEGER
+        temp_max INTEGER,
+        UNIQUE(area_code, date)
     )
     """)
 
@@ -22,12 +23,12 @@ def init_db():
     conn.close()
 
 
-def insert_forecast(area_code, date, weather, temp_min, temp_max):
+def save_forecast(area_code, date, weather, temp_min, temp_max):
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO forecasts
+        INSERT OR IGNORE INTO forecasts
         (area_code, date, weather, temp_min, temp_max)
         VALUES (?, ?, ?, ?, ?)
     """, (area_code, date, weather, temp_min, temp_max))

@@ -1,11 +1,11 @@
 import requests
 from datetime import datetime
-from db import insert_forecast
+from db import save_forecast
 
 FORECAST_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/{}.json"
 
 
-def fetch_and_save_forecast(area_code):
+def fetch_and_store(area_code):
     res = requests.get(FORECAST_URL.format(area_code), timeout=5).json()
 
     short = res[0]["timeSeries"][0]
@@ -21,4 +21,4 @@ def fetch_and_save_forecast(area_code):
         low = temps[i * 2] if i * 2 < len(temps) else None
         high = temps[i * 2 + 1] if i * 2 + 1 < len(temps) else None
 
-        insert_forecast(area_code, date, weather, low, high)
+        save_forecast(area_code, date, weather, low, high)
