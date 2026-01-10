@@ -1,6 +1,6 @@
 import flet as ft
 import requests
-from datetime import datetime
+from datetime import datetime, date
 
 from db import init_db, load_forecasts, load_forecast_by_date
 from jma_api import fetch_and_store
@@ -104,9 +104,9 @@ def main(page: ft.Page):
 
         cards = ft.Row(wrap=True, spacing=16)
 
-        for date, weather, low, high in rows:
+        for d, weather, low, high in rows:
             icon = weather_icon(weather)
-            disp_date = datetime.fromisoformat(date).strftime("%m/%d")
+            disp_date = datetime.fromisoformat(d).strftime("%m/%d")
 
             cards.controls.append(
                 ft.Container(
@@ -118,11 +118,7 @@ def main(page: ft.Page):
                         [
                             ft.Text(disp_date, weight="bold"),
                             ft.Text(icon, size=44),
-                            ft.Text(
-                                weather,
-                                size=11,
-                                text_align="center",
-                            ),
+                            ft.Text(weather, size=11, text_align="center"),
                             ft.Text(f"{low}/{high}℃"),
                         ],
                         horizontal_alignment="center",
@@ -139,8 +135,11 @@ def main(page: ft.Page):
         if not selected_area_code:
             return
 
-        date = e.control.value  # YYYY-MM-DD
-        row = load_forecast_by_date(selected_area_code, date)
+        if e.control.value is None:
+            return
+
+        date_str = e.control.value.strftime("%Y-%m-%d")
+        row = load_forecast_by_date(selected_area_code, date_str)
 
         content_area.controls.clear()
 
@@ -151,11 +150,11 @@ def main(page: ft.Page):
             page.update()
             return
 
-        date, weather, low, high = row
+        d, weather, low, high = row
         icon = weather_icon(weather)
 
         content_area.controls.append(
-            ft.Text(f"{selected_pref_name}（{date}）", size=26, weight="bold")
+            ft.Text(f"{selected_pref_name}（{d}）", size=26, weight="bold")
         )
 
         content_area.controls.append(
@@ -179,18 +178,19 @@ def main(page: ft.Page):
         page.update()
 
     date_picker = ft.DatePicker(
+        value=date.today(),
         on_change=on_date_change
     )
     page.overlay.append(date_picker)
 
     def open_date_picker(e):
         page.open(date_picker)
-        
+
     pick_date_btn = ft.ElevatedButton(
-    "日付を選択",
-    icon=ft.Icons.CALENDAR_MONTH,
-    on_click=open_date_picker,
-)
+        "日付を選択",
+        icon=ft.Icons.CALENDAR_MONTH,
+        on_click=open_date_picker,
+    )
 
     # -------- UI --------
     region_dd = ft.Dropdown(
